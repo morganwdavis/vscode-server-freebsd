@@ -1,0 +1,70 @@
+#!/bin/sh
+#
+# PROVIDE: debian
+# REQUIRE: archdep mountlate
+# KEYWORD: nojail
+#
+
+. /etc/rc.subr
+
+name="debian"
+desc="Debian for FreeBSD Linux Binary Compatibility"
+rcvar="debian_enable"
+start_cmd="${name}_start"
+stop_cmd=":"
+
+unmounted() {
+  [ "$(stat -f "%d" "$1")" = "$(stat -f "%d" "$1/..")" ] && [ "$(stat -f "%i" "$1")" != "$(stat -f "%i" "$1/..")" ]
+}
+
+debian_start() {
+  local _tmpdir
+
+  load_kld -e 'linux(aout|elf)' linux
+
+  case "$(sysctl -n hw.machine_arch)" in
+  amd64)
+    load_kld -e 'linux64elf' linux64
+    ;;
+  esac
+
+  if [ -x "/compat/debian/sbin/ldconfigDisabled" ]; then
+    _tmpdir=$(mktemp -d -t linux-ldconfig)
+    /compat/debian/sbin/ldconfig -C "${_tmpdir}/ld.so.cache"
+    if ! cmp -s "${_tmpdir}/ld.so.cache" "/compat/debian/etc/ld.so.cache"; then
+      cat "${_tmpdir}/ld.so.cache" >"/compat/debian/etc/ld.so.cache"
+    fi
+    rm -rf "${_tmpdir}"
+  fi
+
+  load_kld pty
+
+  if [ "$(sysctl -ni kern.elf64.fallback_brand)" -eq "-1" ]; then
+    sysctl kern.elf64.fallback_brand=3 >/dev/null
+  fi
+
+  if [ "$(sysctl -ni kern.elf32.fallback_brand)" -eq "-1" ]; then
+    sysctl kern.elf32.fallback_brand=3 >/dev/null
+  fi
+
+  sysctl compat.linux.emul_path="/compat/debian"
+
+  unmounted "/compat/debian/dev" && (mount -o nocover -t devfs devfs "/compat/debian/dev" || exit 1)
+  unmounted "/compat/debian/dev/fd" && (mount -o nocover,linrdlnk -t fdescfs fdescfs "/compat/debian/dev/fd" || exit 1)
+  unmounted "/compat/debian/dev/shm" && (mount -o nocover,mode=1777 -t tmpfs tmpfs "/compat/debian/dev/shm" || exit 1)
+  unmounted "/compat/debian/home" && (mount -t nullfs /home "/compat/debian/home" || exit 1)
+  unmounted "/compat/debian/proc" && (mount -o nocover -t linprocfs linprocfs "/compat/debian/proc" || exit 1)
+  unmounted "/compat/debian/sys" && (mount -o nocover -t linsysfs linsysfs "/compat/debian/sys" || exit 1)
+  unmounted "/compat/debian/tmp" && (mount -t nullfs /tmp "/compat/debian/tmp" || exit 1)
+  unmounted /dev/fd && (mount -o nocover -t fdescfs fdescfs /dev/fd || exit 1)
+  unmounted /proc && (mount -o nocover -t procfs procfs /proc || exit 1)
+
+  # Make sure these symlinks exist
+  ln -sf ../lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 /compat/debian/lib64/ld-linux-x86-64.so.2
+  ln -sf /compat/debian/usr/bin/mawk /compat/debian/usr/local/bin/awk
+
+  true
+}
+
+load_rc_config $name
+run_rc_command "$1"

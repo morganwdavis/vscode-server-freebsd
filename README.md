@@ -13,7 +13,7 @@ Compatible with VS Code 1.88+ and FreeBSD 14. This is possible using `debootstra
 # service linux enable && service linux start
 # debootstrap bookworm /compat/debian
 # cp .bash_debian ~
-# cp debian /usr/local/etc/rc.d
+# install -m 0755 -o root -g wheel debian /usr/local/etc/rc.d
 # service debian enable && service debian start
 ```
 

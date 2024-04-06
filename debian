@@ -21,14 +21,8 @@ debian_start() {
   sysctl compat.linux.emul_path="/compat/debian"
 
   unmounted "/compat/debian/dev" && (mount -o nocover -t devfs devfs "/compat/debian/dev" || exit 1)
-  unmounted "/compat/debian/dev/fd" && (mount -o nocover,linrdlnk -t fdescfs fdescfs "/compat/debian/dev/fd" || exit 1)
-  unmounted "/compat/debian/dev/shm" && (mount -o nocover,mode=1777 -t tmpfs tmpfs "/compat/debian/dev/shm" || exit 1)
   unmounted "/compat/debian/home" && (mount -t nullfs /home "/compat/debian/home" || exit 1)
   unmounted "/compat/debian/proc" && (mount -o nocover -t linprocfs linprocfs "/compat/debian/proc" || exit 1)
-  unmounted "/compat/debian/sys" && (mount -o nocover -t linsysfs linsysfs "/compat/debian/sys" || exit 1)
-  unmounted "/compat/debian/tmp" && (mount -t nullfs /tmp "/compat/debian/tmp" || exit 1)
-  unmounted "/dev/fd" && (mount -o nocover -t fdescfs fdescfs "/dev/fd" || exit 1)
-  unmounted "/proc" && (mount -o nocover -t procfs procfs "/proc" || exit 1)
 
   # Make sure this symlink exists
   ln -sf ../lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 /compat/debian/lib64/ld-linux-x86-64.so.2

@@ -45,7 +45,7 @@ A convenient way to open VS Code onto your remote SSH connection and start in a 
 
 ... where `vscode-server` matches the Host identifier in the ssh config entry and everything else after that matches the path to your project.
 
-## LEGACY OPTION - Using Debian (deprecated)
+## LEGACY OPTION - Debian (deprecated)
 
 This legacy option is compatible with VS Code 1.88+ and FreeBSD 14. This is possible using `debootstrap` to install a stable release of [Debian](https://www.debian.org/News/), such as 12.5, codename "Bookworm".
 

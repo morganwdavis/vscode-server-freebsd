@@ -12,6 +12,7 @@
 # pkg install linux-rl9-libsigsegv
 # service linux enable
 # service linux start
+# cp .bash_linux ~
 ```
 
 Allow sshd to accept BASH_ENV references during the connection:

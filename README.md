@@ -9,10 +9,10 @@
 ### Setting Up the FreeBSD Server
 
 ```shell
-# pkg install linux-rl9-libsigsegv
 # service linux enable
 # service linux start
 # cp .bash_linux ~
+# pkg install linux-rl9-libsigsegv
 ```
 
 Allow sshd to accept BASH_ENV references during the connection:

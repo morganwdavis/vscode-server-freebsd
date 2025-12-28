@@ -3,27 +3,27 @@
 ### Setting Up the FreeBSD Server
 
 ```shell
-# service linux enable
-# service linux start
-# cp .bash_linux ~
-# pkg install linux_base-rl9-9.5_6
+service linux enable
+service linux start
+cp .bash_linux ~
+pkg install linux_base-rl9
 ```
 
 Allow sshd to accept BASH_ENV references during the connection:
 
 ```shell
-# sysrc sshd_flags="-o AcceptEnv=BASH_ENV"
+sysrc sshd_flags="-o AcceptEnv=BASH_ENV"
 ```
 
 ... and then restart sshd with `service sshd restart`.
 
 It is also a good idea to reboot and check that everything starts up properly to avoid surprises later.
 
-### Setting Up the VS Code Client
+## Setting Up the VS Code Client
 
 Edit your `~/ssh/config` file on your computer where the VS Code client is installed and add a special host entry just for VS Code connections:
 
-```
+```text
 Host vscode-server
 	Hostname	my.vscode.server.com
 	SetEnv BASH_ENV=".bash_linux"
@@ -38,8 +38,3 @@ A convenient way to open VS Code onto your remote SSH connection and start in a 
 `"C:\Program Files\Microsoft VS Code\Code.exe" --folder-uri vscode-remote://ssh-remote+vscode-server/home/username/path/to/project`
 
 ... where `vscode-server` matches the Host identifier in the ssh config entry and everything else after that matches the path to your project.
-
-
-Note for Windows users: If you use the shortcut feature described above, you must add `/compat/debian` as a path component for it to work.  Example:
-
-`"C:\Program Files\Microsoft VS Code\Code.exe" --folder-uri vscode-remote://ssh-remote+vscode-server/compat/debian/home/username/path/to/project`
